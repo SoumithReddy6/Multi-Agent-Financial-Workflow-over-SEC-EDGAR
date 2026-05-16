@@ -1,0 +1,30 @@
+name: deal_screening
+title: Deal Screening Memo
+objective: Rapidly screen a public company for investment attractiveness using SEC filing evidence and peer comparables.
+target_user: Buy-side analyst or finance-AI evaluator
+retrieval_queries:
+  - business model durability
+  - revenue growth margin profile competitive risks
+  - peer valuation and operating comparison
+required_sections:
+  - executive_summary
+  - business_overview
+  - key_financials
+  - comparable_insights
+  - risks
+  - catalysts
+  - diligence_questions
+risk_checks:
+  - customer concentration
+  - margin compression
+  - regulatory exposure
+  - competitive intensity
+output_fields:
+  - recommendation
+  - confidence
+  - source_citations
+evaluation_rubric:
+  - Memo includes a clear recommendation.
+  - Memo cites filing and comparable evidence.
+  - Memo separates catalysts from risks.
+  - JSON validates against the InvestmentMemo schema.

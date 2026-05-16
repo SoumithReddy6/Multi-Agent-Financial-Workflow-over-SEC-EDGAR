@@ -1,0 +1,29 @@
+name: credit_memo
+title: Credit Memo
+objective: Assess borrower quality, balance-sheet resilience, liquidity, and downside risk from SEC disclosures.
+target_user: Private credit analyst or lender
+retrieval_queries:
+  - debt maturity liquidity interest expense
+  - cash flow leverage covenant risk
+  - peer balance sheet resilience
+required_sections:
+  - executive_summary
+  - key_financials
+  - risks
+  - diligence_questions
+  - source_citations
+risk_checks:
+  - debt maturity wall
+  - interest coverage
+  - free cash flow conversion
+  - covenant headroom
+output_fields:
+  - recommendation
+  - confidence
+  - key_financials
+  - risks
+evaluation_rubric:
+  - Memo discusses debt and liquidity explicitly.
+  - Memo flags downside scenarios.
+  - Memo includes evidence from filing text or XBRL facts.
+  - JSON validates against the InvestmentMemo schema.

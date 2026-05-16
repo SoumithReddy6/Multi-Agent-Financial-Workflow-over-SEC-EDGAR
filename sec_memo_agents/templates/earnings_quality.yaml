@@ -1,0 +1,29 @@
+name: earnings_quality
+title: Earnings Quality Review
+objective: Evaluate whether reported earnings appear supported by durable revenue, margins, cash conversion, and accounting disclosures.
+target_user: Equity research analyst
+retrieval_queries:
+  - revenue recognition deferred revenue margins cash flow
+  - non recurring items impairment restructuring
+  - peer margin quality earnings risk
+required_sections:
+  - executive_summary
+  - key_financials
+  - comparable_insights
+  - risks
+  - diligence_questions
+risk_checks:
+  - revenue recognition changes
+  - one-time gains or charges
+  - margin sustainability
+  - cash flow divergence
+output_fields:
+  - recommendation
+  - confidence
+  - key_financials
+  - risks
+evaluation_rubric:
+  - Memo identifies earnings-quality signals.
+  - Memo includes at least one cash-flow or margin-related question.
+  - Memo cites source evidence.
+  - JSON validates against the InvestmentMemo schema.

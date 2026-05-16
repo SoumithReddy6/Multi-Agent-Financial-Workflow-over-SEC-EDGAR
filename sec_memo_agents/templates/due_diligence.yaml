@@ -1,0 +1,28 @@
+name: due_diligence
+title: Due Diligence Checklist
+objective: Generate a diligence-oriented memo that turns filing analysis into follow-up questions and evidence requests.
+target_user: Corporate development or investment diligence team
+retrieval_queries:
+  - management discussion operating results
+  - risk factor diligence questions
+  - segment revenue customers suppliers
+required_sections:
+  - business_overview
+  - risks
+  - diligence_questions
+  - comparable_insights
+  - source_citations
+risk_checks:
+  - disclosure gaps
+  - segment concentration
+  - supplier dependency
+  - accounting policy changes
+output_fields:
+  - diligence_questions
+  - risks
+  - source_citations
+evaluation_rubric:
+  - Memo converts observations into actionable diligence questions.
+  - Memo distinguishes evidence-backed risks from assumptions.
+  - Memo includes citations.
+  - JSON validates against the InvestmentMemo schema.

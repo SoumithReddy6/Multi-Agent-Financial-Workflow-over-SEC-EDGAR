@@ -1,0 +1,31 @@
+ticker,sector,reason
+AAPL,Information Technology,large-cap hardware and services disclosure
+MSFT,Information Technology,cloud software and AI infrastructure peer
+GOOGL,Communication Services,advertising cloud and AI platform disclosure
+AMZN,Consumer Discretionary,ecommerce cloud and logistics disclosure
+NVDA,Information Technology,semiconductor AI demand peer
+META,Communication Services,digital advertising and AI capex peer
+TSLA,Consumer Discretionary,automotive manufacturing and energy peer
+JPM,Financials,large bank credit and balance sheet disclosure
+BAC,Financials,banking credit and liquidity peer
+WFC,Financials,banking risk and regulatory disclosure
+V,Financials,payments network peer
+MA,Financials,payments network peer
+UNH,Health Care,managed care and healthcare regulation peer
+JNJ,Health Care,pharma medtech consumer health peer
+PFE,Health Care,pharmaceutical pipeline peer
+XOM,Energy,integrated energy peer
+CVX,Energy,integrated energy peer
+COP,Energy,upstream energy peer
+WMT,Consumer Staples,retail scale and margin peer
+COST,Consumer Staples,membership retail peer
+HD,Consumer Discretionary,home improvement retail peer
+LOW,Consumer Discretionary,home improvement retail peer
+PG,Consumer Staples,consumer brands peer
+KO,Consumer Staples,beverage brands peer
+PEP,Consumer Staples,food and beverage peer
+BA,Industrials,aerospace manufacturing risk peer
+CAT,Industrials,industrial cyclicality peer
+GE,Industrials,industrial systems peer
+NEE,Utilities,regulated utility and renewables peer
+DUK,Utilities,regulated utility peer

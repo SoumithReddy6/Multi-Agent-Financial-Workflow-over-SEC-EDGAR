@@ -1,0 +1,29 @@
+name: covenant_risk
+title: Covenant Risk Screen
+objective: Screen for covenant, leverage, liquidity, and refinancing risks using SEC filing language and XBRL facts.
+target_user: Leveraged finance analyst
+retrieval_queries:
+  - covenant compliance leverage ratio liquidity refinancing
+  - debt agreement restrictive covenants
+  - peer leverage liquidity risk
+required_sections:
+  - executive_summary
+  - key_financials
+  - risks
+  - diligence_questions
+  - source_citations
+risk_checks:
+  - restrictive covenants
+  - secured debt
+  - refinancing risk
+  - going concern language
+output_fields:
+  - recommendation
+  - confidence
+  - risks
+  - source_citations
+evaluation_rubric:
+  - Memo explicitly discusses liquidity or debt risk.
+  - Memo raises covenant follow-up questions.
+  - Memo cites SEC evidence.
+  - JSON validates against the InvestmentMemo schema.

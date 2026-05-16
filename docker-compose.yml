@@ -1,0 +1,11 @@
+services:
+  sec-memo-api:
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./.cache:/app/.cache
+    command: uvicorn sec_memo_agents.api.app:app --host 0.0.0.0 --port 8000 --reload

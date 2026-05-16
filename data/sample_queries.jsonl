@@ -1,0 +1,6 @@
+{"id":"q001","ticker":"AAPL","template_name":"deal_screening","question":"Screen Apple for investment attractiveness and cite risks from the filing."}
+{"id":"q002","ticker":"AAPL","template_name":"credit_memo","question":"Assess credit risk using balance sheet and liquidity signals."}
+{"id":"q003","ticker":"AAPL","template_name":"earnings_quality","question":"Evaluate whether earnings appear durable or dependent on one-time factors."}
+{"id":"q004","ticker":"AAPL","template_name":"due_diligence","question":"Create diligence questions for customer, supplier, and regulatory risks."}
+{"id":"q005","ticker":"AAPL","template_name":"management_discussion","question":"Summarize key MD&A signals and compare with peers."}
+{"id":"q006","ticker":"AAPL","template_name":"covenant_risk","question":"Check for debt, covenant, refinancing, and liquidity concerns."}

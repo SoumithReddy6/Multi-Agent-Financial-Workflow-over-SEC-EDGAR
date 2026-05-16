@@ -1,0 +1,23 @@
+sec:
+  max_requests_per_second: 8
+  cache_dir: .cache/sec
+  forms:
+    - 10-K
+    - 10-Q
+
+retrieval:
+  embedding_dimensions: 384
+  chunk_size: 1800
+  chunk_overlap: 220
+  top_k: 5
+
+synthesis:
+  provider: offline
+  openai_model: gpt-4o-mini
+  anthropic_model: claude-3-5-sonnet-latest
+  temperature: 0
+
+evaluation:
+  target_completion_rate: 0.81
+  target_latency_seconds: 30
+  require_schema_validity: true

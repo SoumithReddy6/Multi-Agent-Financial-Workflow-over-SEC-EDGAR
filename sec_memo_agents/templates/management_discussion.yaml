@@ -1,0 +1,29 @@
+name: management_discussion
+title: MD&A Signal Extraction
+objective: Extract management commentary signals from MD&A and compare them with peer disclosures.
+target_user: Public markets analyst
+retrieval_queries:
+  - management discussion trends uncertainty outlook
+  - demand pricing costs supply chain
+  - peer management commentary
+required_sections:
+  - executive_summary
+  - business_overview
+  - comparable_insights
+  - catalysts
+  - diligence_questions
+risk_checks:
+  - changed tone from prior periods
+  - demand uncertainty
+  - cost inflation
+  - disclosure boilerplate
+output_fields:
+  - executive_summary
+  - comparable_insights
+  - catalysts
+  - source_citations
+evaluation_rubric:
+  - Memo summarizes management commentary clearly.
+  - Memo separates actual disclosure from interpretation.
+  - Memo includes peer comparison evidence.
+  - JSON validates against the InvestmentMemo schema.

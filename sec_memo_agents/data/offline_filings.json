@@ -1,0 +1,98 @@
+{
+  "AAPL": [
+    {
+      "metadata": {
+        "cik": "0000320193",
+        "ticker": "AAPL",
+        "company_name": "Apple Inc.",
+        "form_type": "10-K",
+        "accession_number": "0000320193-24-000123",
+        "filing_date": "2024-11-01",
+        "report_date": "2024-09-28",
+        "primary_document": "aapl-20240928.htm",
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/0000320193-24-000123-index.html",
+        "document_url": "https://www.sec.gov/Archives/edgar/data/320193/000032019324000123/aapl-20240928.htm"
+      },
+      "text": "Item 1. Business Apple designs, manufactures, and markets smartphones, personal computers, tablets, wearables, accessories, and services. The company competes through integrated hardware, software, and services ecosystems. Item 1A. Risk Factors The company faces risks from intense competition, supply chain concentration, regulatory scrutiny, foreign exchange, and dependence on successful product introductions. Item 7. Management's Discussion Revenue performance depends on iPhone demand, services growth, gross margin, product mix, and operating expense discipline. Item 8. Financial Statements The company reports revenue, net income, cash, assets, liabilities, and long-term debt in its consolidated statements.",
+      "xbrl_facts": {
+        "facts": {
+          "us-gaap": {
+            "Revenues": {
+              "units": {
+                "USD": [
+                  {"val": 391035000000, "fy": 2024, "form": "10-K", "filed": "2024-11-01", "end": "2024-09-28", "accn": "0000320193-24-000123"}
+                ]
+              }
+            },
+            "NetIncomeLoss": {
+              "units": {
+                "USD": [
+                  {"val": 93736000000, "fy": 2024, "form": "10-K", "filed": "2024-11-01", "end": "2024-09-28", "accn": "0000320193-24-000123"}
+                ]
+              }
+            },
+            "Assets": {
+              "units": {
+                "USD": [
+                  {"val": 364980000000, "fy": 2024, "form": "10-K", "filed": "2024-11-01", "end": "2024-09-28", "accn": "0000320193-24-000123"}
+                ]
+              }
+            },
+            "Liabilities": {
+              "units": {
+                "USD": [
+                  {"val": 308030000000, "fy": 2024, "form": "10-K", "filed": "2024-11-01", "end": "2024-09-28", "accn": "0000320193-24-000123"}
+                ]
+              }
+            }
+          }
+        }
+      },
+      "sections": {
+        "business": "Apple designs, manufactures, and markets smartphones, personal computers, tablets, wearables, accessories, and services. The company competes through integrated hardware, software, and services ecosystems.",
+        "risk_factors": "The company faces risks from intense competition, supply chain concentration, regulatory scrutiny, foreign exchange, and dependence on successful product introductions.",
+        "mda": "Revenue performance depends on iPhone demand, services growth, gross margin, product mix, and operating expense discipline."
+      }
+    },
+    {
+      "metadata": {
+        "cik": "0000789019",
+        "ticker": "MSFT",
+        "company_name": "Microsoft Corporation",
+        "form_type": "10-K",
+        "accession_number": "0000950170-24-087843",
+        "filing_date": "2024-07-30",
+        "report_date": "2024-06-30",
+        "primary_document": "msft-20240630.htm",
+        "filing_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017024087843/0000950170-24-087843-index.htm",
+        "document_url": "https://www.sec.gov/Archives/edgar/data/789019/000095017024087843/msft-20240630.htm"
+      },
+      "text": "Item 1. Business Microsoft develops software, cloud services, devices, gaming platforms, search, and AI infrastructure. Item 1A. Risk Factors The company faces competition, cybersecurity, regulation, cloud capacity, and AI infrastructure execution risks. Item 7. Management's Discussion Growth is influenced by Azure demand, commercial cloud adoption, operating leverage, capital expenditures, and enterprise software renewals.",
+      "xbrl_facts": {
+        "facts": {
+          "us-gaap": {
+            "Revenues": {
+              "units": {
+                "USD": [
+                  {"val": 245122000000, "fy": 2024, "form": "10-K", "filed": "2024-07-30", "end": "2024-06-30", "accn": "0000950170-24-087843"}
+                ]
+              }
+            },
+            "NetIncomeLoss": {
+              "units": {
+                "USD": [
+                  {"val": 88136000000, "fy": 2024, "form": "10-K", "filed": "2024-07-30", "end": "2024-06-30", "accn": "0000950170-24-087843"}
+                ]
+              }
+            }
+          }
+        }
+      },
+      "sections": {
+        "business": "Microsoft develops software, cloud services, devices, gaming platforms, search, and AI infrastructure.",
+        "risk_factors": "The company faces competition, cybersecurity, regulation, cloud capacity, and AI infrastructure execution risks.",
+        "mda": "Growth is influenced by Azure demand, commercial cloud adoption, operating leverage, capital expenditures, and enterprise software renewals."
+      }
+    }
+  ]
+}
