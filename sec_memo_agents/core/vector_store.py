@@ -1,37 +1,23 @@
-"""FAISS-compatible retrieval layer with a pure-Python fallback."""
+"""Vector store with a pluggable embedder and optional FAISS search.
+
+The store is embedder-agnostic. By default it uses the dependency-free
+``HashEmbedder`` so it can run anywhere; the ``RetrievalAgent`` wires in a real
+``SentenceTransformerEmbedder`` for production semantic retrieval. FAISS
+(``IndexFlatIP``) is used for similarity search when ``faiss-cpu`` is installed,
+with a pure-Python cosine fallback otherwise. Because all embeddings are
+L2-normalized, inner product equals cosine similarity in both paths.
+"""
 
 from __future__ import annotations
 
-import hashlib
 import json
-import math
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from sec_memo_agents.core.embeddings import Embedder, HashEmbedder, build_embedder
 from sec_memo_agents.core.text import summarize_snippet
 from sec_memo_agents.schemas import RetrievedEvidence
-
-
-TOKEN_RE = re.compile(r"[A-Za-z][A-Za-z0-9_'-]+")
-
-
-def _hash_embedding(text: str, dimensions: int) -> list[float]:
-    vector = [0.0] * dimensions
-    tokens = TOKEN_RE.findall(text.lower())
-    for token in tokens:
-        digest = hashlib.blake2b(token.encode("utf-8"), digest_size=8).digest()
-        signed_digest = hashlib.blake2b(("salt:" + token).encode("utf-8"), digest_size=8).digest()
-        index = int.from_bytes(digest, "big") % dimensions
-        sign = -1.0 if int.from_bytes(signed_digest, "big") % 2 else 1.0
-        vector[index] += sign
-    norm = math.sqrt(sum(value * value for value in vector)) or 1.0
-    return [value / norm for value in vector]
-
-
-def _cosine(left: list[float], right: list[float]) -> float:
-    return sum(a * b for a, b in zip(left, right))
 
 
 @dataclass
@@ -41,29 +27,44 @@ class VectorRecord:
     embedding: list[float]
 
 
-@dataclass
 class VectorStore:
-    """Simple vector store that uses deterministic embeddings and optional FAISS search."""
+    """Vector store over an injected embedder.
 
-    dimensions: int = 384
-    records: list[VectorRecord] = field(default_factory=list)
+    Pass an ``embedder`` to control how text is vectorized. When omitted, a
+    deterministic ``HashEmbedder`` of ``dimensions`` is used so the store has no
+    heavy dependencies by default.
+    """
+
+    def __init__(
+        self,
+        embedder: Embedder | None = None,
+        dimensions: int = 384,
+    ) -> None:
+        self.embedder: Embedder = embedder or HashEmbedder(dimensions)
+        self.dimensions = self.embedder.dimensions
+        self.records: list[VectorRecord] = []
 
     def add_texts(self, texts: list[str], metadatas: list[dict[str, Any]]) -> None:
         if len(texts) != len(metadatas):
             raise ValueError("texts and metadatas must be the same length")
-        for text, metadata in zip(texts, metadatas):
-            self.records.append(VectorRecord(text=text, metadata=metadata, embedding=_hash_embedding(text, self.dimensions)))
+        if not texts:
+            return
+        embeddings = self.embedder.embed(texts)
+        for text, metadata, embedding in zip(texts, metadatas, embeddings):
+            self.records.append(VectorRecord(text=text, metadata=metadata, embedding=embedding))
 
     def search(self, query: str, top_k: int = 5, exclude_ticker: str | None = None) -> list[RetrievedEvidence]:
-        query_vector = _hash_embedding(query, self.dimensions)
-        eligible = []
+        query_vector = self.embedder.embed([query])[0]
+        eligible: list[VectorRecord] = []
         for record in self.records:
             ticker = (record.metadata.get("ticker") or "").upper()
             if exclude_ticker and ticker == exclude_ticker.upper():
                 continue
             eligible.append(record)
 
-        scored = self._score_with_faiss(query_vector, eligible, top_k) or self._score_with_python(query_vector, eligible, top_k)
+        scored = self._score_with_faiss(query_vector, eligible, top_k)
+        if scored is None:
+            scored = self._score_with_python(query_vector, eligible, top_k)
 
         evidence: list[RetrievedEvidence] = []
         for score, record in scored:
@@ -83,13 +84,17 @@ class VectorStore:
             )
         return evidence
 
+    @staticmethod
+    def _cosine(left: list[float], right: list[float]) -> float:
+        return sum(a * b for a, b in zip(left, right))
+
     def _score_with_python(
         self,
         query_vector: list[float],
         records: list[VectorRecord],
         top_k: int,
     ) -> list[tuple[float, VectorRecord]]:
-        scored = [(_cosine(query_vector, record.embedding), record) for record in records]
+        scored = [(self._cosine(query_vector, record.embedding), record) for record in records]
         scored.sort(key=lambda item: item[0], reverse=True)
         return scored[:top_k]
 
@@ -112,13 +117,19 @@ class VectorStore:
         index = faiss.IndexFlatIP(self.dimensions)
         index.add(matrix)
         scores, indices = index.search(query, min(top_k, len(records)))
-        return [(float(score), records[int(index_value)]) for score, index_value in zip(scores[0], indices[0]) if index_value >= 0]
+        return [
+            (float(score), records[int(index_value)])
+            for score, index_value in zip(scores[0], indices[0])
+            if index_value >= 0
+        ]
 
     def save(self, path: str | Path) -> None:
         target = Path(path)
         target.parent.mkdir(parents=True, exist_ok=True)
         payload = {
             "dimensions": self.dimensions,
+            "embedder": self.embedder.name,
+            "semantic": getattr(self.embedder, "semantic", False),
             "records": [
                 {"text": record.text, "metadata": record.metadata, "embedding": record.embedding}
                 for record in self.records
@@ -127,9 +138,18 @@ class VectorStore:
         target.write_text(json.dumps(payload), encoding="utf-8")
 
     @classmethod
-    def load(cls, path: str | Path) -> "VectorStore":
+    def load(cls, path: str | Path, embedder: Embedder | None = None) -> "VectorStore":
         payload = json.loads(Path(path).read_text(encoding="utf-8"))
-        store = cls(dimensions=payload["dimensions"])
+        dimensions = payload["dimensions"]
+        if embedder is None:
+            # Rebuild a matching embedder so query embedding stays consistent
+            # with the stored record vectors.
+            saved_name = payload.get("embedder", "")
+            if payload.get("semantic") and saved_name:
+                embedder = build_embedder(backend="auto", model_name=saved_name, hash_dimensions=dimensions)
+            else:
+                embedder = HashEmbedder(dimensions)
+        store = cls(embedder=embedder)
         store.records = [
             VectorRecord(
                 text=item["text"],
@@ -145,6 +165,8 @@ class VectorStore:
         try:
             import faiss  # noqa: F401
 
-            return "faiss-compatible"
+            search = "faiss"
         except Exception:
-            return "python"
+            search = "python-cosine"
+        kind = "semantic" if getattr(self.embedder, "semantic", False) else "lexical"
+        return f"{self.embedder.name} ({kind}) + {search}"

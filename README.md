@@ -15,7 +15,7 @@ The project is designed as a portfolio-ready system for finance-AI roles: it use
 ## What It Builds
 
 - Parser agent: pulls 10-K and 10-Q metadata, filing documents, and XBRL facts from SEC EDGAR.
-- Retrieval agent: chunks filings, exposes LangChain `Document` adapters, indexes comparable-company evidence, and retrieves peer snippets through FAISS when `faiss-cpu` is installed.
+- Retrieval agent: chunks filings, embeds them with a local sentence-transformer model (`all-MiniLM-L6-v2`) for true semantic search, exposes LangChain `Document` adapters, and retrieves comparable-company peer snippets through FAISS. Falls back to a deterministic lexical embedder only when the model is unavailable.
 - Synthesis agent: emits structured investment memos validated by Pydantic schemas.
 - Function-calling schemas: exports OpenAI and Anthropic tool schemas for strict memo generation.
 - Workflow templates: reusable finance playbooks for deal screening, credit memos, due diligence, earnings quality, covenant risk, and MD&A analysis.
@@ -98,10 +98,16 @@ Run tests:
 pytest
 ```
 
-Run the offline benchmark:
+Run the offline workflow benchmark:
 
 ```bash
 python3 scripts/evaluate_workflow.py --offline --queries data/sample_queries.jsonl --output artifacts/evaluation_metrics.json
+```
+
+Run the retrieval-quality benchmark (no API key; compares semantic vs lexical):
+
+```bash
+python3 scripts/evaluate_retrieval.py --compare --output artifacts/retrieval_metrics.json
 ```
 
 ## Real SEC Ingestion
@@ -150,16 +156,41 @@ curl http://localhost:8000/schemas/openai/investment_memo
 
 ## Metrics
 
-| Metric | Target | Current offline demo | How to reproduce |
-| --- | ---: | ---: | --- |
-| SEC filings processed | 200+ real filings | Demo fixture + crawl script ready | `python3 scripts/ingest_sec_filings.py --target-filings 200` |
-| Task completion rate | 81%+ | 100% on 6 sample queries | `python3 scripts/evaluate_workflow.py --offline` |
-| End-to-end memo latency | < 30s | p95 < 0.1s offline | `artifacts/evaluation_metrics.json` |
-| Schema-valid JSON outputs | 100% | 100% | Pydantic `InvestmentMemo` validation |
-| Reusable workflow templates | 5+ | 6 | `sec_memo_agents/templates/*.yaml` |
-| Automated tests | Passing | 8 tests passing | `pytest` |
+Two things are measured honestly and separately: **retrieval quality** (no API key
+needed) and the **workflow harness** (schema validity, latency, templates, tests).
 
-The codebase is instrumented for the larger live benchmark. The offline demo exists so the workflow can be shown reliably without paid LLM keys or live SEC requests.
+### Retrieval quality (measured)
+
+On a labeled multi-sector corpus, `scripts/evaluate_retrieval.py --compare`
+scores whether the system surfaces true same-sector comparable companies.
+
+| Metric | Lexical hash baseline | Semantic (`all-MiniLM-L6-v2`) |
+| --- | ---: | ---: |
+| MRR (top comparable is a true peer) | 0.32 | **1.00** |
+| Recall@3 | 0.29 | **0.88** |
+| Precision@3 | 0.19 | **0.58** |
+
+Reproduce: `python3 scripts/evaluate_retrieval.py --compare --output artifacts/retrieval_metrics.json`
+(Precision@3 is capped at 0.67 here because each sector has only two retrievable
+peers, so the third slot is necessarily off-sector; recall@3 and MRR are the
+cleaner signals.)
+
+### Workflow harness
+
+| Metric | Current | How to reproduce |
+| --- | ---: | --- |
+| Reusable workflow templates | 6 | `sec_memo_agents/templates/*.yaml` |
+| Schema-valid JSON outputs | 100% | Pydantic `InvestmentMemo` validation enforces this by construction |
+| Automated tests | 10 passing, 1 semantic test skipped in CI | `pytest` |
+| Offline demo latency | p95 < 0.1s | deterministic template fill, no LLM call — `python3 scripts/evaluate_workflow.py --offline` |
+
+> Honesty notes: The offline workflow benchmark exercises a **deterministic
+> template-fill fallback** so the system can be demoed without API keys; its
+> "100% schema-valid" result is guaranteed by Pydantic validation and is not a
+> measure of analysis quality. Real memo-quality metrics require an LLM key
+> (`LLM_PROVIDER=openai|anthropic`) and the live SEC path. The 200+ filing crawl
+> is supported by `scripts/ingest_sec_filings.py` but is run on demand, not a
+> pre-computed result.
 
 ## Repository Layout
 

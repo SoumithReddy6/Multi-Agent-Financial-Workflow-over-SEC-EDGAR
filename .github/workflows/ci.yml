@@ -9,6 +9,10 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    env:
+      # Force the deterministic lexical embedder in CI so tests stay fast and
+      # offline (no model download). Production/local runs default to semantic.
+      EMBEDDING_BACKEND: hash
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,5 +30,8 @@ jobs:
       - name: Run tests
         run: pytest
 
-      - name: Run offline benchmark
+      - name: Run offline workflow benchmark
         run: python scripts/evaluate_workflow.py --offline --queries data/sample_queries.jsonl --output artifacts/evaluation_metrics.json
+
+      - name: Run retrieval benchmark (lexical backend)
+        run: python scripts/evaluate_retrieval.py --backend hash --output artifacts/retrieval_metrics.json

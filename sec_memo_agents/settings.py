@@ -19,6 +19,8 @@ class Settings:
     anthropic_api_key: str
     openai_model: str
     anthropic_model: str
+    embedding_backend: str
+    embedding_model: str
     embedding_dimensions: int
     chunk_size: int
     chunk_overlap: int
@@ -67,6 +69,8 @@ def get_settings() -> Settings:
         anthropic_api_key=os.getenv("ANTHROPIC_API_KEY", ""),
         openai_model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
         anthropic_model=os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-latest"),
+        embedding_backend=os.getenv("EMBEDDING_BACKEND", "auto").lower(),
+        embedding_model=os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2"),
         embedding_dimensions=_int_env("EMBEDDING_DIMENSIONS", 384),
         chunk_size=_int_env("CHUNK_SIZE", 1800),
         chunk_overlap=_int_env("CHUNK_OVERLAP", 220),

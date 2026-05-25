@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from sec_memo_agents.core.embeddings import build_embedder
 from sec_memo_agents.core.text import chunk_text
 from sec_memo_agents.core.vector_store import VectorStore
 from sec_memo_agents.schemas import FilingDocument, RetrievedEvidence, WorkflowTemplate
@@ -9,11 +10,25 @@ from sec_memo_agents.settings import Settings, get_settings
 
 
 class RetrievalAgent:
-    """Indexes filing chunks and retrieves relevant comparable evidence."""
+    """Indexes filing chunks and retrieves relevant comparable evidence.
+
+    By default the agent builds a semantic embedder (sentence-transformers) so
+    comparable-company retrieval matches on meaning, not exact tokens. If the
+    model is unavailable it transparently falls back to the deterministic hash
+    embedder. Set ``EMBEDDING_BACKEND=hash`` to force the lexical fallback (used
+    in CI to keep tests fast and offline).
+    """
 
     def __init__(self, vector_store: VectorStore | None = None, settings: Settings | None = None) -> None:
         self.settings = settings or get_settings()
-        self.vector_store = vector_store or VectorStore(dimensions=self.settings.embedding_dimensions)
+        if vector_store is None:
+            embedder = build_embedder(
+                backend=self.settings.embedding_backend,
+                model_name=self.settings.embedding_model,
+                hash_dimensions=self.settings.embedding_dimensions,
+            )
+            vector_store = VectorStore(embedder=embedder)
+        self.vector_store = vector_store
 
     def index_filings(self, filings: list[FilingDocument]) -> int:
         texts: list[str] = []
